@@ -11,19 +11,29 @@ class Params:
     ] 
     len = 43
 
-    sr = 22050*2
-    n_fft = 1024
-    n_stft = 513
-    
-    hop_length = 64
-    mel_freq = 64
-    power = 2.0
-    win_length = 256
 
-    #sr = 22050
-    #n_fft = 2048
-    #hop_length = 256
-    #mel_freq = 128
-    #win_length = 512
+    sr = 22050
+    n_fft = 2048
+    n_stft = int((n_fft//2) + 1)
+  
+    frame_shift = 0.0125 # seconds
+    hop_length = int(n_fft/8.0)
+  
+    frame_length = 0.05 # seconds  
+    win_length = int(n_fft/2.0)
+  
+    mel_freq = 128
+    max_mel_time = 1024
+  
+    max_db = 100  
+    scale_db = 10
+    ref = 4.0
+    power = 2.0
+    norm_db = 10 
+    ampl_multiplier = 10.0
+    ampl_amin = 1e-10
+    db_multiplier = 1.0
+    ampl_ref = 1.0
+    ampl_power = 1.0
 
 p = Params()
