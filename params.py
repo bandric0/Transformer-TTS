@@ -8,8 +8,8 @@ class Params:
     'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', \
     'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'à', \
     'â', 'è', 'é', 'ê', 'ü', '’', '“', '”' \
-    ] 
-    len = 43
+    '1', '2', '3', '4', '5', '6', '7', '8', '9', '0']  
+    len = 53
 
 
     sr = 22050
@@ -35,5 +35,15 @@ class Params:
     db_multiplier = 1.0
     ampl_ref = 1.0
     ampl_power = 1.0
+
+    text_num_embeddings = 2*len(symbols)  
+    embedding_size = 256
+    encoder_embedding_size = 512 
+
+    dim_feedforward = 1024
+    postnet_embedding_size = 1024
+
+    encoder_kernel_size = 3
+    postnet_kernel_size = 5
 
 p = Params()
