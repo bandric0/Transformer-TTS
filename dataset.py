@@ -20,7 +20,7 @@ class TTSDataset(Dataset):
       text_mel = self.memo.get(wav_name)
 
       if text_mel is None:
-        wav_path = f"Transformer-TTS/data/LJSpeech-1.1/wavs/{wav_name}.wav"
+        wav_path = f"data/LJSpeech-1.1/wavs/{wav_name}.wav"
         text = textToSeq(row["text_norm"])
 
         wav, sr = torchaudio.load(wav_path, normalize=True)
@@ -35,42 +35,68 @@ class TTSDataset(Dataset):
 
     def __len__(self):
         return len(self.df)
-    
+
+
+def maskFromSeqLengths(sequence_lengths, max_length):
+    ones = sequence_lengths.new_ones(sequence_lengths.size(0), max_length)
+    range_tensor = ones.cumsum(dim=1)
+    return sequence_lengths.unsqueeze(1) >= range_tensor 
+
+
 
 def textMelCollateFn(batch):
-    text_length_max = torch.tensor([text.shape[-1] for text, _ in batch], dtype=torch.int32).max()
-    mel_length_max = torch.tensor([mel.shape[-1] for _, mel in batch], dtype=torch.int32).max()
+  text_length_max = torch.tensor(
+    [text.shape[-1] for text, _ in batch], 
+    dtype=torch.int32
+  ).max()
 
-    text_lengths = []
-    mel_lengths = []
-    texts_padded = []
-    mels_padded = []
+  mel_length_max = torch.tensor(
+    [mel.shape[-1] for _, mel in batch],
+    dtype=torch.int32
+  ).max()
 
-    for text, mel in batch:
-        text_length = text.shape[-1]      
+  
+  text_lengths = []
+  mel_lengths = []
+  texts_padded = []
+  mels_padded = []
 
-        text_padded = torch.nn.functional.pad(text, pad=[0, text_length_max-text_length], value=0)
+  for text, mel in batch:
+    text_length = text.shape[-1]      
 
-        mel_length = mel.shape[-1]
-        mel_padded = torch.nn.functional.pad(mel, pad=[0, mel_length_max-mel_length], value=0)
+    text_padded = torch.nn.functional.pad(
+      text,
+      pad=[0, text_length_max-text_length],
+      value=0
+    )
 
-        text_lengths.append(text_length)    
-        mel_lengths.append(mel_length)    
-        texts_padded.append(text_padded)    
-        mels_padded.append(mel_padded)
+    mel_length = mel.shape[-1]
+    mel_padded = torch.nn.functional.pad(
+        mel,
+        pad=[0, mel_length_max-mel_length],
+        value=0
+    )
 
-    text_lengths = torch.tensor(text_lengths, dtype=torch.int32)
-    mel_lengths = torch.tensor(mel_lengths, dtype=torch.int32)
-    texts_padded = torch.stack(texts_padded, 0)
-    mels_padded = torch.stack(mels_padded, 0).transpose(1, 2)
+    text_lengths.append(text_length)    
+    mel_lengths.append(mel_length)    
+    texts_padded.append(text_padded)    
+    mels_padded.append(mel_padded)
 
-    stop_token_padded = mel_lengths.unsqueeze(1) >= mel_lengths.new_ones(mel.size(0), mel_length_max).cumsum(dim=1)
-    stop_token_padded = (~stop_token_padded).float()
-    stop_token_padded[:, -1] = 1.0
+  text_lengths = torch.tensor(text_lengths, dtype=torch.int32)
+  mel_lengths = torch.tensor(mel_lengths, dtype=torch.int32)
+  texts_padded = torch.stack(texts_padded, 0)
+  mels_padded = torch.stack(mels_padded, 0).transpose(1, 2)
+
+  stop_token_padded = maskFromSeqLengths(
+      mel_lengths,
+      mel_length_max
+  )
+  stop_token_padded = (~stop_token_padded).float()
+  stop_token_padded[:, -1] = 1.0
+  
+  return texts_padded, \
+         text_lengths, \
+         mels_padded, \
+         mel_lengths, \
+         stop_token_padded \
     
-    return texts_padded, \
-            text_lengths, \
-            mels_padded, \
-            mel_lengths, \
-            stop_token_padded \
-            

@@ -1,7 +1,4 @@
 class Params:
-    csv_path = "/data/metadata.csv"
-    wav_path = "/data/LJSpeech-1.1/wavs"
-    
     symbols = [
     'EOS', ' ', '!', ',', '-', '.', \
     ';', '?', 'a', 'b', 'c', 'd', 'e', 'f', \
@@ -9,22 +6,19 @@ class Params:
     'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'à', \
     'â', 'è', 'é', 'ê', 'ü', '’', '“', '”' \
     '1', '2', '3', '4', '5', '6', '7', '8', '9', '0']  
-    len = 53
+    len = 52
 
 
     sr = 22050
     n_fft = 2048
-    n_stft = int((n_fft//2) + 1)
-  
-    frame_shift = 0.0125 # seconds
-    hop_length = int(n_fft/8.0)
-  
-    frame_length = 0.05 # seconds  
-    win_length = int(n_fft/2.0)
-  
+    n_stft = 1025
+    
+    hop_length = 256
+    win_length = 1024
+    
     mel_freq = 128
     max_mel_time = 1024
-  
+    
     max_db = 100  
     scale_db = 10
     ref = 4.0
@@ -36,14 +30,24 @@ class Params:
     ampl_ref = 1.0
     ampl_power = 1.0
 
-    text_num_embeddings = 2*len(symbols)  
-    embedding_size = 256
-    encoder_embedding_size = 512 
+    
+    
+    text_num_embeddings = 2*52
+    embedding_size = 64
+    encoder_embedding_size = 128 
 
-    dim_feedforward = 1024
-    postnet_embedding_size = 1024
+    dim_feedforward = 256
+    postnet_embedding_size = 256
 
-    encoder_kernel_size = 3
-    postnet_kernel_size = 5
+    encoder_kernel_size = 2
+    postnet_kernel_size = 4
 
+    
+    
+    batch_size = 16
+    grad_clip = 1.0
+    lr = 2.0 * 1e-4
+    r_gate = 1.0
+
+    
 p = Params()

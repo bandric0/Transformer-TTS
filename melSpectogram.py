@@ -56,7 +56,7 @@ def inverse_mel_spec_to_wav(mel_spec):
     return pseudo_wav
 
 if __name__ == "__main__":
-    wav_path = "../Downloads/file_example_WAV_2MG.wav"
+    wav_path = "data/LJSpeech-1.1/wavs/LJ001-0001.wav"
     wav, sr = torchaudio.load(wav_path, normalize=True)
     
     mel_spec = convert_to_mel_spec(wav)

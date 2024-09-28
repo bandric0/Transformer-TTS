@@ -1,9 +1,9 @@
 import torch
-from params import p
+from params import p as hp
 
 def getI(c):
-    for i in range(p.len):
-        if c == p.symbols[i]:
+    for i in range(hp.len):
+        if c == hp.symbols[i]:
             return i
     return None
 
